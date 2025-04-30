@@ -1,0 +1,159 @@
+<div
+  id="product-container"
+  data-button-text="{{ block.settings.button_text }}"
+  data-button-color="{{ block.settings.button_color }}"
+  data-api-key="{{ block.settings.api_key }}"
+  style="margin-top: 10px; display: flex; flex-direction: column; gap: 20px;"
+></div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const container = document.getElementById('product-container');
+    const buttonText = container.dataset.buttonText;
+    const buttonColor = container.dataset.buttonColor;
+    const apiKey = container.dataset.apiKey;
+
+    let currencySign = window.dynamaticActiveCurrency;
+
+    fetch(
+      `https://navidium-static-assets.s3.us-east-1.amazonaws.com/dynamatics-assets/cdn/hefajt.myshopify.com/${apiKey}.json`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        try {
+          const audience = data?.audiences?.[0];
+          const experience = audience?.experiences?.[0];
+          const variation = experience?.variations?.[0];
+          const widget = variation?.widgets?.[0];
+          const campaignId = experience?.campaign_id;
+          const zoneId = experience?.zone_id;
+
+          const products =
+            data?.audiences?.[0]?.experiences?.[0]?.variations?.[0]?.widgets?.[0]?.property?.cart?.content
+              ?.productSection?.selectedProducts;
+
+          const general =
+            data?.audiences?.[0]?.experiences?.[0]?.variations?.[0]?.widgets?.[0]?.property?.cart?.content?.general;
+
+          let html = `
+            <div style="margin-bottom: 20px;">
+              <p style="margin: 0; font-size: 20px; font-weight: bold;">${general?.title || ''}</p>
+              <p style="margin: 0; font-size: 14px; font-weight: bold;">${general?.subTitle || ''}</p>
+            </div>
+            `;
+
+          products?.forEach((product, index) => {
+            const variant = product?.product_variants?.[0];
+            html += `
+              <div style="display: flex; align-items: center; gap: 20px; margin: 10px;">
+                <img src="${product?.product_image}" style="border-radius: 10px;" width="140px" height="140px" />
+                <div>
+                  <h2 style="margin: 0;">${product?.product_title}</h2>
+                  <p style="margin: 0;">${currencySign.symbol}${variant?.variant_price || 'N/A'}</p>
+                  <div style=" font-size: 18px; color:rgb(247, 146, 15);">
+                    ${'★'.repeat(general?.ratings || 0)}${'★'.repeat(5 - (general?.ratings || 0))}
+                  </div>
+                  <button style="padding: 10px 20px; background-color: ${buttonColor}; color: white; 
+                  border: none; border-radius: 5px; cursor: pointer;"
+                  class="add-to-cart-btn"
+                  data-variant-id="${variant?.variant_id}"
+                  data-experience-id="${experience?.id}"
+                  data-variation-id="${variation?.id}"
+                  data-audience-id="${audience?.id}"
+                  data-widget-id="${widget?.id}"
+                  data-campaign-id="${campaignId}"
+                  data-zone-id="${zoneId}"
+                  >
+                    ${buttonText}
+                  </button>
+                </div>
+              </div>
+              ${index < products.length - 1 ? '<hr style="margin: 20px 0;">' : ''}
+            `;
+          });
+
+          document.getElementById('product-container').innerHTML = html;
+        } catch (err) {
+          console.error('Error parsing product data:', err);
+          document.getElementById('product-container').innerHTML = '<p>Failed to load product data.</p>';
+        }
+      })
+      .catch((err) => {
+        console.error('Fetch error:', err);
+        document.getElementById('product-container').innerHTML = '<p>Failed to load product data.</p>';
+      });
+
+    container.addEventListener('click', function (event) {
+      if (event.target.classList.contains('add-to-cart-btn')) {
+
+        const variantId = event.target.dataset.variantId;
+
+        const experienceId = event.target.dataset.experienceId;
+        const audienceId = event.target.dataset.audienceId;
+        const widgetId = event.target.dataset.widgetId;
+        const campaignId = event.target.dataset.campaignId;
+        const zoneId = event.target.dataset.zoneId;
+
+        const formData = {
+          items: [
+            {
+              id: parseInt(variantId),
+              quantity: 1,
+              properties: {
+                experienceId: parseInt(experienceId),
+                variationId: parseInt(variantId),
+                audienceId: parseInt(audienceId),
+                widgetId: parseInt(widgetId),
+                campaignId: parseInt(campaignId),
+                zoneId: parseInt(zoneId),
+              },
+            },
+          ],
+        };
+
+        fetch(window.Shopify.routes.root + 'cart/add.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log('Added to cart:', data);
+            alert('Product added to cart!');
+          })
+          .catch((error) => {
+            console.error('Add to cart error:', error);
+          });
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Product",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button Color",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "api_key",
+      "label": "API Key (dynamic part of the URL)",
+      "default": "ZID0873-HEF52121745906979-WEBPAGECATEGORY"
+    }
+  ]
+}
+{% endschema %}

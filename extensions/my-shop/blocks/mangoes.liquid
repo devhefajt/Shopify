@@ -1,0 +1,87 @@
+<!-- Trigger Button -->
+<div style="text-align: center; margin: 40px 0;">
+  <button
+    onclick="openProductModal()"
+    style="padding: 10px 20px; background-color: #10b981; color: white; border: none; border-radius: 5px; cursor: pointer;"
+  >
+    View Featured Products
+  </button>
+</div>
+
+<!-- Modal -->
+<div
+  id="productModal"
+  style="
+    display: none;
+    z-index: 9999;
+    margin-bottom: 50px;
+    width: 300px;
+    height: 350px;
+  "
+>
+  <div
+    style="
+        background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      text-align: center;
+    "
+  >
+    <span
+      onclick="document.getElementById('productModal').style.display='none'"
+      style="
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+      "
+      >&times;</span
+    >
+
+    <h2>Featured Products</h2>
+    <div
+      id="modalProductContent"
+      style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 20px;"
+    ></div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Show data via api",
+  "target": "body"
+}
+{% endschema %}
+
+<script>
+  function openProductModal() {
+    fetch('https://hefajt.myshopify.com/products/mango-time.js')
+      .then((response) => response.json())
+      .then((product) => {
+        const container = document.getElementById('modalProductContent');
+        container.innerHTML = '';
+
+        const productCard = `
+          <div style="width: 200px;  border: 1px solid #ddd; padding: 10px;">
+            <img src="${product.featured_image}" alt="${product.title}" style="max-width: 100%; border-radius: 10px;" width="100px" height="100px">
+            <h3 style="font-size: 16px;">${product.title}</h3>
+            <p style="font-weight: bold;">Tk ${(product.price / 100).toFixed(2)}</p>
+          </div>
+        `;
+
+        container.innerHTML += productCard;
+        document.getElementById('productModal').style.display = 'flex';
+      })
+      .catch((error) => {
+        console.error('Error fetching product:', error);
+      });
+  }
+</script>
+
+

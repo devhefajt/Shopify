@@ -1,0 +1,16 @@
+api_version = "2025-04"
+
+[[extensions]]
+name = "new_shop"
+handle = "new-shop"
+type = "ui_extension"
+
+[[extensions.targeting]]
+module = "./src/Checkout.jsx"
+target = "purchase.checkout.block.render"
+
+[extensions.capabilities]
+api_access = true
+network_access = true
+block_progress = true
+

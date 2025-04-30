@@ -1,0 +1,47 @@
+<div style="margin-top: 10px;">
+  <button
+    onclick="alert('Added to wishlist!')"
+    style="
+      background-color: {{ block.settings.button_color }};
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    "
+    onmouseover="this.style.backgroundColor='{{ block.settings.button_hover_color }}'"
+    onmouseout="this.style.backgroundColor='{{ block.settings.button_color }}'"
+  >
+    ❤️ {{ block.settings.button_text }}
+  </button>
+</div>
+
+{% schema %}
+{
+  "name": "Add to Wishlist Button",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Add to Wishlist"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button Background",
+      "default": "#ec4899"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_color",
+      "label": "Button Hover Background",
+      "default": "#be185d"
+    }
+  ]
+}
+{% endschema %}

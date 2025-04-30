@@ -1,0 +1,13 @@
+api_version = "2025-04"
+
+[[extensions]]
+name = "my-shop2"
+handle = "my-shop2"
+type = "ui_extension"
+
+[[extensions.targeting]]
+module = "./src/Checkout.jsx"
+target = "purchase.checkout.block.render"
+
+[extensions.capabilities]
+api_access = true

@@ -3,7 +3,7 @@
 client_id = "8fa40a141a1ff62b63807d1082b94f07"
 name = "My new awesome app"
 handle = "my-new-awesome-app-235"
-application_url = "https://localhost:44469"
+application_url = "https://localhost:37445"
 embedded = true
 
 [build]
@@ -27,9 +27,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://localhost:44469/auth/callback",
-  "https://localhost:44469/auth/shopify/callback",
-  "https://localhost:44469/api/auth/callback"
+  "https://localhost:37445/auth/callback",
+  "https://localhost:37445/auth/shopify/callback",
+  "https://localhost:37445/api/auth/callback"
 ]
 
 [pos]
